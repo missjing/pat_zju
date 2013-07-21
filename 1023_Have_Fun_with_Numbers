@@ -1,0 +1,72 @@
+1023. Have Fun with Numbers (20)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+Notice that the number 123456789 is a 9-digit number consisting exactly the numbers from 1 to 9, with no duplication. Double it we will obtain 246913578, which happens to be another 9-digit number consisting exactly the numbers from 1 to 9, only in a different permutation. Check to see the result if we double it again!
+
+Now you are suppose to check if there are more numbers with this property. That is, double a given number with k digits, you are to tell if the resulting number consists of only a permutation of the digits in the original number.
+
+Input Specification:
+
+Each input file contains one test case. Each case contains one positive integer with no more than 20 digits.
+
+Output Specification:
+
+For each test case, first print in a line "Yes" if doubling the input number gives a number that consists of only a permutation of the digits in the original number, or "No" if not. Then in the next line, print the doubled number.
+
+Sample Input:
+1234567899
+Sample Output:
+Yes
+2469135798
+
+--------------------------------------------------------------------------------------------------------------------
+解：此题要注意范围，int 最大值10位，long long最大值19位，不满足题目的20位，因此用字符串处理；
+此外排列的判断用二进制移位求和，和值相等即为排列；再就是要考虑到进位.
+
+#include <iostream>
+#include <string>
+using namespace std;
+ 
+int moveBit(int n)
+{
+    return 1 << n;
+}
+ 
+int main()
+{
+    string str ;
+    cin >> str;
+    int len = str.length();
+    int sum1 = 0, sum2 = 0;
+    int carry = 0;
+    int tmp;
+    while(len)
+    {
+        sum1 += moveBit(str[len - 1] - '0');
+        tmp = (str[len - 1] - '0' ) * 2;
+        str[len - 1] = '0' + tmp  % 10 + carry;
+        sum2 += moveBit(str[len - 1] - '0');
+        carry = (tmp + carry) / 10;
+        len --;
+    }
+    if(sum1 == sum2)
+        cout << "Yes" << endl;
+    else
+        cout << "No" << endl;
+    if(carry == 0)
+        cout << str << endl;
+    else
+        cout << carry << str << endl;
+     
+    return 0;
+}
