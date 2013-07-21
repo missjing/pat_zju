@@ -1,0 +1,153 @@
+1021. Deepest Root (25)
+
+时间限制
+1500 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+A graph which is connected and acyclic can be considered a tree. The height of the tree depends on the selected root. Now you are supposed to find the root that results in a highest tree. Such a root is called the deepest root.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains a positive integer N (<=10000) which is the number of nodes, and hence the nodes are numbered from 1 to N. Then N-1 lines follow, each describes an edge by given the two adjacent nodes' numbers.
+
+Output Specification:
+
+For each test case, print each of the deepest roots in a line. If such a root is not unique, print them in increasing order of their numbers. In case that the given graph is not a tree, print "Error: K components" where K is the number of connected components in the graph.
+
+Sample Input 1:
+5
+1 2
+1 3
+1 4
+2 5
+Sample Output 1:
+3
+4
+5
+Sample Input 2:
+5
+1 3
+1 4
+2 5
+3 4
+Sample Output 2:
+Error: 2 components
+
+---------------------------------------------------------------------------------------------------------------------
+解：先用并查集求有几个团，如果只有一个团再用广度搜索求deepest root。注意点（1）树的最长路径其实有个很方便的求法。任取一个点x，求出距离x最远的一个点y，然后求出距离y最远的一个点z。y到z就是一条最长路径。（2）使用set，保证存的root数据已排序并且值唯一。（3）邻接表的使用
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <set>
+#include <cstring>
+using namespace std;
+ 
+const int MAX = 10001;
+int father[MAX];
+int r[MAX];
+int dist[MAX];
+int isVisit[MAX];
+set<int> ans;
+vector<int> adj_list[MAX];  //邻接表
+int n;
+ 
+void makeSet()
+{
+    for(int i = 1; i <= n; i++)
+    {
+        father[i] = i;
+        r[i] = 0;
+    }
+}
+ 
+int findSet(int i)
+{
+    if(father[i] != i)
+        father[i] = findSet(father[i]);
+    return father[i];
+}
+ 
+void unionSet(int x, int y)
+{
+    if(x == y)
+        return;
+    if(r[x] > r[y])
+        father[y] = x;
+    else 
+    {
+        father[x] = y;
+        if(r[x] == r[y])    
+            r[y] ++;
+    }
+}
+ 
+int bfs(int start)  //更新max_height
+{
+    memset(isVisit, 0, sizeof(isVisit));
+    memset(dist, 0, sizeof(dist));
+    isVisit[start] = 1;
+    dist[start] = 0;
+    queue<int> q;
+    q.push(start);
+    int max_height = 0;
+    while(!q.empty())
+    {
+        int cur = q.front();
+        q.pop();
+        for(int i = 0; i < adj_list[cur].size(); i++)
+        {
+            int index = adj_list[cur][i];
+            if(!isVisit[index])
+            {
+                isVisit[index] = 1;
+                dist[index] = dist[cur] + 1;
+                q.push(index);
+                max_height = max(dist[index], max_height);
+            }       
+        }
+    }
+    return max_height;
+}
+int main()
+{
+    cin >> n;
+    makeSet();
+    for(int i = 0; i < n - 1; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        unionSet(findSet(u), findSet(v));
+        adj_list[u].push_back(v);
+        adj_list[v].push_back(u);
+    }
+    int count = 0;
+    for(int i = 1; i <= n; i++)
+        if(father[i] == i)
+            count++;
+    if(count > 1) //有若干个部分
+        cout << "Error: " << count <<" components"<< endl;
+    else  //生成树
+    {
+        int max_height =  bfs(1);
+        for(int i = 1; i <= n; i++)
+            if(dist[i] == max_height)
+                ans.insert(i);
+        max_height = bfs(*ans.begin());
+        for(int i = 1; i <= n; i++)
+            if(dist[i] == max_height)
+                ans.insert(i);
+        std::set<int>::iterator it;
+        for(it = ans.begin(); it != ans.end(); it++)
+            cout << *it << endl;
+    }
+    return 0;
+}
