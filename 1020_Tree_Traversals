@@ -1,0 +1,103 @@
+1020. Tree Traversals (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+Suppose that all the keys in a binary tree are distinct positive integers. Given the postorder and inorder traversal sequences, you are supposed to output the level order traversal sequence of the corresponding binary tree.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line gives a positive integer N (<=30), the total number of nodes in the binary tree. The second line gives the postorder sequence and the third line gives the inorder sequence. All the numbers in a line are separated by a space.
+
+Output Specification:
+
+For each test case, print in one line the level order traversal sequence of the corresponding binary tree. All the numbers in a line must be separated by exactly one space, and there must be no extra space at the end of the line.
+
+Sample Input:
+7
+2 3 1 5 7 6 4
+1 2 3 4 5 6 7
+Sample Output:
+4 1 6 3 5 7 2
+
+--------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+#include <queue>
+using namespace std;
+ 
+struct Node
+{
+    Node* left;
+    Node* right;
+    int data;
+};
+ 
+const int MAX = 30;
+int postorder[MAX];
+int inorder[MAX];
+int N;
+int post_index;
+int index = 0;
+Node biTree[MAX];
+ 
+ 
+Node* createTree(int begin, int end)
+{
+    int i;
+    if(begin > end)
+        return NULL;
+    int cur_index = index++;
+    biTree[cur_index].data = postorder[post_index --];
+    for(i = begin; i <= end; i ++)
+    {
+        if(inorder[i] == biTree[cur_index].data)
+            break;
+    }
+        //这里一定要先递归右子树，因为是根据后序（左右根）来查找根
+    biTree[cur_index].right = createTree(i + 1, end);
+    biTree[cur_index].left = createTree(begin, i - 1);
+    return &biTree[cur_index];
+}
+ 
+void levelPrint(Node* root)
+{
+    queue<Node*> q;
+    q.push(root);
+    bool is_first = true;
+    while(!q.empty())
+    {
+        Node* curr = q.front();
+        q.pop();
+        if(curr == NULL)
+            continue;
+        if(is_first == false)
+            cout << ' ';
+        else
+            is_first = false;
+        cout << curr->data;
+        q.push(curr->left);
+        q.push(curr->right);
+    }
+ 
+}
+int main()
+{
+    cin >> N;
+    for(int i = 0; i < N; i++)
+        cin >> postorder[i];
+    for(int i = 0; i < N; i++)
+        cin >> inorder[i];
+    post_index = N - 1;
+    Node* root = createTree(0, N - 1);
+    levelPrint(root);
+ 
+    return 0;
+}
