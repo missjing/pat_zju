@@ -1,0 +1,78 @@
+1009. Product of Polynomials (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+This time, you are supposed to find A*B where A and B are two polynomials.
+
+Input Specification:
+
+Each input file contains one test case. Each case occupies 2 lines, and each line contains the information of a polynomial: K N1 aN1 N2 aN2 ... NK aNK, where K is the number of nonzero terms in the polynomial, Ni and aNi (i=1, 2, ..., K) are the exponents and coefficients, respectively. It is given that 1 <= K <= 10, 0 <= NK < ... < N2 < N1 <=1000.
+
+Output Specification:
+
+For each test case you should output the product of A and B in one line, with the same format as the input. Notice that there must be NO extra space at the end of each line. Please be accurate up to 1 decimal place.
+
+Sample Input
+2 1 2.4 0 3.2
+2 2 1.5 1 0.5
+Sample Output
+3 3 3.6 2 6.0 1 1.6
+
+----------------------------------------------------------------------------------------------------------------------
+解：理解怎么乘后其实跟1002类似，只是存结果的数组需开得更大
+
+#include <iostream>
+#include <iomanip>
+using namespace std;
+ 
+int main()
+{
+    int m,n;
+    double m_mul[1001];
+    double n_mul[1001];
+    double product[2001];
+ 
+    for(int i = 0; i < 1001; ++i){
+        m_mul[i] = n_mul[i] = product[i] = 0.f;
+    }
+    cin >> m;
+    for(int i = 0; i < m; ++i){
+        int index1;
+        cin >> index1;
+        cin >> m_mul[index1] ;
+    }
+    cin >> n;
+    for(int i = 0; i < n; ++i){
+        int index2;
+        cin >> index2;
+        cin >> n_mul[index2];
+    }
+ 
+    for(int i = 0; i < 1001; ++i)
+        for(int j = 0; j < 1001; ++j){
+            if(m_mul[i] != 0 && n_mul[j] != 0){
+                product[i + j] +=m_mul[i] * n_mul[j];
+            }
+        }
+ 
+    int num = 0;
+    for(int i = 0; i < 2001; ++i)
+        if(product[i] != 0)
+            num++;
+ 
+    cout << num;
+    for(int i = 2000; i >= 0; --i){
+        if(product[i] != 0.f)
+            cout << ' ' << i << ' ' << setiosflags(ios::fixed) << setprecision(1) <<  product[i];
+    }
+    return 0;
+}
