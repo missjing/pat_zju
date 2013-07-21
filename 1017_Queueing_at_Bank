@@ -1,0 +1,137 @@
+1017. Queueing at Bank (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+Suppose a bank has K windows open for service. There is a yellow line in front of the windows which devides the waiting area into two parts. All the customers have to wait in line behind the yellow line, until it is his/her turn to be served and there is a window available. It is assumed that no window can be occupied by a single customer for more than 1 hour.
+
+Now given the arriving time T and the processing time P of each customer, you are supposed to tell the average waiting time of all the customers.
+
+Input Specification:
+
+Each input file contains one test case. For each case, the first line contains 2 numbers: N (<=10000) - the total number of customers, and K (<=100) - the number of windows. Then N lines follow, each contains 2 times: HH:MM:SS - the arriving time, and P - the processing time in minutes of a customer. Here HH is in the range [00, 23], MM and SS are both in [00, 59]. It is assumed that no two customers arrives at the same time.
+
+Notice that the bank opens from 08:00 to 17:00. Anyone arrives early will have to wait in line till 08:00, and anyone comes too late (at or after 17:00:01) will not be served nor counted into the average.
+
+Output Specification:
+
+For each test case, print in one line the average waiting time of all the customers, in minutes and accurate up to 1 decimal place.
+
+Sample Input:
+7 3
+07:55:00 16
+17:00:01 2
+07:59:59 15
+08:01:00 60
+08:00:00 30
+08:00:02 2
+08:03:00 10
+Sample Output:
+8.2
+
+--------------------------------------------------------------------------------------------------------------------
+#include<iostream>  
+#include<iomanip>  
+#include<queue>  
+using namespace std;  
+ 
+struct window  
+{  
+    int mm;  
+    int hh;  
+    int ss;  
+    bool operator<(const window& a)const  
+    {  
+        if(hh>a.hh)  
+            return true;  
+        else if(hh==a.hh&&mm>a.mm)  
+            return true;  
+        else if(hh==a.hh&&mm==a.mm&&ss>a.ss)  
+            return true;  
+        else  
+            return false;  
+    }  
+};  
+ 
+struct customer  
+{  
+    int h;  
+    int m;  
+    int s;  
+    int last;  
+    bool operator<(const customer& a)const  
+    {  
+        if(h>a.h)  
+            return true;  
+        else if(h==a.h&&m>a.m)  
+            return true;  
+        else if(h==a.h&&m==a.m&&s>a.s)  
+            return true;  
+        else  
+            return false;  
+    }  
+};  
+ 
+priority_queue<window> bank;  
+priority_queue<customer> cu;  
+ 
+int main()  
+{   
+    int n,k,i;  
+    cin>>n>>k;  
+    window w;  
+    for(i=0;i<k;i++)  
+    {  
+        w.ss=0;  
+        w.mm=0;  
+        w.hh=8;  
+        bank.push(w);  
+    }  
+    customer cust;  
+    for(i=0;i<n;i++)  
+    {  
+        cin>>cust.h;  
+        getchar();  
+        cin>>cust.m;  
+        getchar();  
+        cin>>cust.s>>cust.last;  
+        cu.push(cust);  
+    }  
+    int c=0;  
+    double total=0;  
+    while(!cu.empty())  
+    {  
+        cust=cu.top();  
+        cu.pop();  
+        if(cust.h>17||(cust.h==17&&cust.m)||(cust.h==17&&!cust.m&&cust.s))  
+            break;  
+        c++;  
+        w=bank.top();  
+        bank.pop();  
+        if(cust.h<w.hh||(cust.h==w.hh&&cust.m<w.mm)||(cust.h==w.hh&&cust.m==w.mm&&cust.s<w.ss))  
+        {  
+            total+=(w.hh-cust.h)*60.0+(w.mm-cust.m)+(w.ss-cust.s)/60.0;  
+            w.mm+=cust.last;  
+            w.hh+=w.mm/60;  
+            w.mm%=60;  
+        }  
+        else  //have window but the customer not come yet  so no need to wait  
+        {  
+            w.ss=cust.s;  
+            w.mm=cust.m+cust.last;  
+            w.hh=cust.h+w.mm/60;  
+            w.mm%=60;  
+        }  
+        bank.push(w);  
+    }  
+    cout<<fixed<<setprecision(1)<<total/c<<endl;  
+    return 0;  
+}  
