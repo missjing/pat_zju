@@ -1,0 +1,85 @@
+1004. Counting Leaves (30)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+A family hierarchy is usually presented by a pedigree tree. Your job is to count those family members who have no child.
+Input
+
+Each input file contains one test case. Each case starts with a line containing 0 < N < 100, the number of nodes in a tree, and M (< N), the number of non-leaf nodes. Then M lines follow, each in the format:
+
+ID K ID[1] ID[2] ... ID[K]
+where ID is a two-digit number representing a given non-leaf node, K is the number of its children, followed by a sequence of two-digit ID's of its children. For the sake of simplicity, let us fix the root ID to be 01.
+Output
+
+For each test case, you are supposed to count those family members who have no child for every seniority level starting from the root. The numbers must be printed in a line, separated by a space, and there must be no extra space at the end of each line.
+
+The sample case represents a tree with only 2 nodes, where 01 is the root and 02 is its only child. Hence on the root 01 level, there is 0 leaf node; and on the next level, there is 1 leaf node. Then we should output "0 1" in a line.
+
+Sample Input
+2 1
+01 1 02
+Sample Output
+0 1
+
+-----------------------------------------------------------------------------------------------------------------
+解：每个非叶子结点有若干个子结点，但对于树来说，每个结点只有一个父结点，这样存储感觉清晰一些
+
+#include
+using namespace std;
+ 
+int parent[101];
+int leaf[101];
+int level[101];
+int maxlevel = 1;
+ 
+//用一个parent[]保存父结点，而不是老想用一个数组保存子结点
+void findLevel(int x){
+    int r = x;
+    int temp = 1;
+    while(parent[r] != r)
+    {
+        temp++;
+        r = parent[r];
+    }
+    level[temp]++;
+    if(temp > maxlevel)
+        maxlevel = temp;
+}
+int main()
+{
+    int node_num, non_leaf_node_num;
+    int parent_id, children_num, child_id;
+    cin >> node_num >> non_leaf_node_num;
+ 
+    for (int i = 0; i < 101; ++i)
+    {
+        leaf[i] =  1;
+        parent[i] = i;   //每个结点id唯一，因此这样赋值能区别开
+        level[i] = 0;
+    }
+ 
+    for (int i = 0; i < non_leaf_node_num; ++i)  {       cin >> parent_id >> children_num;
+        for(int j = 0; j < children_num; ++j)        {           cin >> child_id;
+            parent[child_id] = parent_id;
+        }
+        leaf[parent_id] = 0;
+    }
+ 
+    for(int i = 1; i        if(leaf[i] == 1)
+            findLevel(i);
+    }
+    cout<<level[1];
+    for(int i = 2; i        {
+            cout << ' '<<level[i];
+        }
+    return 0;
+}
