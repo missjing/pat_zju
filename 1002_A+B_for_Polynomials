@@ -1,0 +1,80 @@
+1002. A+B for Polynomials (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+
+This time, you are supposed to find A+B where A and B are two polynomials.
+
+Input
+
+Each input file contains one test case. Each case occupies 2 lines, and each line contains the information of a polynomial: K N1 aN1 N2 aN2 ... NK aNK, where K is the number of nonzero terms in the polynomial, Ni and aNi (i=1, 2, ..., K) are the exponents and coefficients, respectively. It is given that 1 <= K <= 10，0 <= NK < ... < N2 < N1 <=1000.
+
+Output
+
+For each test case you should output the sum of A and B in one line, with the same format as the input. Notice that there must be NO extra space at the end of each line. Please be accurate to 1 decimal place.
+
+Sample Input
+2 1 2.4 0 3.2
+2 2 1.5 1 0.5
+Sample Output
+3 2 1.5 1 2.9 0 3.2
+
+-----------------------------------------------------------------------------------------------------------------
+解：Hash表索引存储的思路，数组表示。
+按精度为小数点后一位输出，一般用printf很方便。在C++里有iomanip头文件支持。具体使用参数见此
+
+#include <iostream>
+//#include <iomanip>
+#include <stdio.h>
+using namespace std;
+ 
+int main()
+{
+    int m,n;
+    int a, b;
+    int flag = 0;
+    double a_coef[1001], b_coef[1001], sum[1001];
+    for(int i = 0; i < 1001; i++)
+    {
+        a_coef[i] = 0.f;
+        b_coef[i] = 0.f;
+        sum[i] = 0.f;
+    }
+    cin >> m;
+    for(int i = 0; i < m; i++)
+    {
+        cin >> a;
+        cin >> a_coef[a];
+    }
+    cin >> n;
+    for(int j = 0; j < n; j++)
+    {
+        cin >> b;
+        cin >> b_coef[b];
+    }
+    for(int k = 0; k < 1001; ++k)
+    {
+        sum[k] = a_coef[k] + b_coef[k];
+        if(sum[k] != 0.f)
+            flag++;
+    }
+    cout<<flag;
+    for (int k = 1000; k >= 0; k--)
+    {
+        if (sum[k] != 0.f)
+        {
+            printf(" %d %.1f", k, sum[k]);
+            //cout << ' '<< k << ' ' << setiosflags(ios::fixed) << setprecision(1) << sum[k];
+        }
+    }
+     return 0;
+}
