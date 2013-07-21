@@ -1,0 +1,133 @@
+1013. Battle Over Cities (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+It is vitally important to have all the cities connected by highways in a war. If a city is occupied by the enemy, all the highways from/toward that city are closed. We must know immediately if we need to repair any other highways to keep the rest of the cities connected. Given the map of cities which have all the remaining highways marked, you are supposed to tell the number of highways need to be repaired, quickly.
+
+For example, if we have 3 cities and 2 highways connecting city1-city2 and city1-city3. Then if city1 is occupied by the enemy, we must have 1 highway repaired, that is the highway city2-city3.
+
+Input
+
+Each input file contains one test case. Each case starts with a line containing 3 numbers N (<1000), M and K, which are the total number of cities, the number of remaining highways, and the number of cities to be checked, respectively. Then M lines follow, each describes a highway by 2 integers, which are the numbers of the cities the highway connects. The cities are numbered from 1 to N. Finally there is a line containing K numbers, which represent the cities we concern.
+
+Output
+
+For each of the K cities, output in a line the number of highways need to be repaired if that city is lost.
+
+Sample Input
+3 2 3
+1 2
+1 3
+1 2 3
+Sample Output
+1
+0
+0
+
+----------------------------------------------------------------------------------------------------------------------
+解：是用并查集来解的典型题，只不过以前我一点也不了解。
+
+基础：
+并查集的两个操作：找出给定元素所属的集合和合并两个集合，即查询和合并功能，是非常实用的两个功能。并查集经常在使用中以森林来表示。并查集还有另外一种翻译是：Union Find Sets，从英文基本可以得出并查集能进行的操作：
+
+1）MAKE-SET(x): 建立一个新的集合，其唯一成员为x。
+
+2）UNION(x,y): 将包含x和y的动态集合合并为一个新的集合。
+
+3）FIND-SET(x): 返回一个指针，指向包含x的集合的代表。
+
+前两个操作伪代码：
+
+MAKE-SET(x)
+  p[x] ← x
+  rank[x] ← 0
+  
+  
+UNION(x, y)
+  LINK(FIND-SET(x), FIND-SET(y))
+  
+LINK(x, y)
+  if rank[x] > rank[y]
+     then p[y] ← x
+     else p[x] ← y
+          if rank[x] = rank[y]
+             then rank[y] ← rank[y] + 1
+其中，LINK是UNION调用的一个子过程，具体代码实现可以参考下边第例子。
+
+------------------------------------------------------------------------------
+#include<iostream>
+#include<vector>
+using namespace  std;
+ 
+struct Edge{
+    int u;
+    int v;
+};
+ 
+vector<Edge> E;
+int n, m, k;
+ 
+const int Max = 1005;
+int f[Max];  //存父节点
+int r[Max]; //存每个结点的秩
+ 
+void MakeSet(){
+    for(int i=1; i<=n; i++){
+        f[i] = i;
+        r[i] = 0;
+    }
+}
+int FindSet(int i){
+    if(f[i] != i)
+        f[i] = FindSet(f[i]);
+    return f[i];
+}
+void UnionSet(int x, int y){
+    if(x == y)
+        return; 
+ 
+    if(r[x] > r[y]){
+        f[y] = x;
+        r[y] = -1;
+    }
+    else{
+        f[x] = y;
+        if(r[x] == r[y])
+            r[y]++;
+ 
+        r[x] = -1;      
+    }
+}
+int main(){
+    //freopen("input.txt", "r", stdin);
+    cin >> n >> m >> k;
+    E.resize(m);
+ 
+    for(int i=0; i<m; i++)
+        cin >> E[i].u >> E[i].v;
+ 
+    for(int i=0; i<k; i++){
+        int p;
+        cin >> p;
+        MakeSet();
+        for(int j=0; j<m; j++){
+            if(E[j].u != p && E[j].v != p)
+                UnionSet(FindSet(E[j].u), FindSet(E[j].v));
+        }
+        int res=0;
+        for(int j=1; j<=n; j++)
+            if(r[j] != -1)
+                res ++;
+        cout << res - 2 <<endl;
+    }
+    return 0;
+}
