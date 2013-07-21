@@ -1,0 +1,164 @@
+1003. Emergency (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+As an emergency rescue team leader of a city, you are given a special map of your country. The map shows several scattered cities connected by some roads. Amount of rescue teams in each city and the length of each road between any pair of cities are marked on the map. When there is an emergency call to you from some other city, your job is to lead your men to the place as quickly as possible, and at the mean time, call up as many hands on the way as possible.
+
+Input
+
+Each input file contains one test case. For each test case, the first line contains 4 positive integers: N (<= 500) - the number of cities (and the cities are numbered from 0 to N-1), M - the number of roads, C1 and C2 - the cities that you are currently in and that you must save, respectively. The next line contains N integers, where the i-th integer is the number of rescue teams in the i-th city. Then M lines follow, each describes a road with three integers c1, c2 and L, which are the pair of cities connected by a road and the length of that road, respectively. It is guaranteed that there exists at least one path from C1 to C2.
+
+Output
+
+For each test case, print in one line two numbers: the number of different shortest paths between C1 and C2, and the maximum amount of rescue teams you can possibly gather.
+All the numbers in a line must be separated by exactly one space, and there is no extra space allowed at the end of a line.
+
+Sample Input
+5 6 0 2
+1 2 1 5 3
+0 1 1
+0 2 2
+0 3 1
+1 2 1
+2 4 1
+3 4 1
+Sample Output
+2 4
+
+----------------------------------------------------------------------------------------------------------------
+解：我算法很烂，这是基础的求最短路径题都做了很久。Dijkstra算法（求最短路径）+DFS（深搜最短路径有几条，因为已知最短路径值，所以有剪枝）。
+
+对递归函数写法的理解，觉得这个比较好：
+递归函数{
+出口条件处理（最低级的情况）;
+return …;
+从第1列的8个位置{
+依次尝试设置格子及限制区域
+向下级递归
+复原上一次尝试
+}
+};
+-----------------------------------------------------------------------------------------
+#include
+using namespace std;
+ 
+const int MAXINT = 999999;
+int city_num, road_num, start, dest;
+int team[501];
+int dist[501];
+int visited[501];
+int w[501][501];
+int path_num = 0;
+int g_max_team_num = 0;
+ 
+void init()
+{
+    for(int i = 0; i < 501; ++i)
+    {
+        team[i] = 0;
+        dist[i] = MAXINT;
+        visited[i] = 0;
+        for(int j = 0; j < 501; ++j)
+            if(j != i)
+            {
+                w[i][j] = MAXINT;
+                w[j][i] = MAXINT;
+            }
+            else
+                w[i][j] = 0;
+    }
+}
+ 
+void Dijkstra(int s)
+{
+    for (int i = 0; i < city_num; ++i)
+    {
+        visited[i] = 0;
+        dist[i] = w[start][i];
+    }
+    visited[start] = 1;
+    dist[start] = 0;
+    for(int i = 1; i < city_num; ++i)
+    {
+        int tmp = MAXINT;
+        int u = start;
+ 
+        //寻找要加入的结点
+        for(int j = 0; j < city_num; ++j)
+        {
+            if(!visited[j] && dist[j] < tmp)
+            {
+                u = j;
+                tmp = dist[j];
+            }
+        }
+        visited[u] = 1;
+ 
+        //更新最短距离
+        for(int j = 0; j < city_num; ++j)
+        {
+            if(!visited[j] && w[u][j] + dist[u] < dist[j])                   
+            dist[j] = w[u][j] + dist[u];        
+        }   
+    } 
+} 
+
+
+void dfs(int s, int d, int cur_dist, int cur_team) 
+{    
+    visited[s] = 1;     
+    if(s == d)  
+    {       
+        if(cur_dist == dist[d])         
+        {           
+            path_num++;             
+            if(cur_team > g_max_team_num)
+            {
+                g_max_team_num = cur_team;
+                return;
+            }
+        }
+    }
+    if(cur_dist > dist[d])
+        return;
+    for(int i = 0; i < city_num; ++i)
+    {
+        if(!visited[i] && w[s][i] < MAXINT)      
+        {           
+            dfs(i, dest, cur_dist + w[s][i], cur_team + team[i]);           
+            visited[i] = 0;         
+        }   
+    } 
+} 
+
+int main() 
+{    
+    cin >> city_num >> road_num >> start >> dest;
+    init();
+    for(int i = 0; i < city_num; ++i)        
+        cin >> team[i];
+ 
+    for (int i = 0; i < road_num; ++i)   
+    {       
+        int p, q, tmp;      
+        cin >> p >> q >> tmp;
+        w[p][q] = w[q][p] = tmp;
+    }
+ 
+    Dijkstra(start);
+ 
+    for(int i = 0; i < city_num; ++i)
+        visited[i] = false;
+    dfs(start, dest, 0, team[start]);
+    cout << path_num << ' ' << g_max_team_num << endl;
+    return 0;
+}
