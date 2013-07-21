@@ -1,0 +1,38 @@
+1010. Radix (25)
+
+时间限制
+400 ms
+内存限制
+32000 kB
+代码长度限制
+16000 B
+判题程序
+Standard
+作者
+CHEN, Yue
+
+Given a pair of positive integers, for example, 6 and 110, can this equation 6 = 110 be true? The answer is "yes", if 6 is a decimal number and 110 is a binary number.
+
+Now for any pair of positive integers N1 and N2, your task is to find the radix of one number while that of the other is given.
+
+Input Specification:
+
+Each input file contains one test case. Each case occupies a line which contains 4 positive integers:
+N1 N2 tag radix
+Here N1 and N2 each has no more than 10 digits. A digit is less than its radix and is chosen from the set {0-9, a-z} where 0-9 represent the decimal numbers 0-9, and a-z represent the decimal numbers 10-35. The last number "radix" is the radix of N1 if "tag" is 1, or of N2 if "tag" is 2.
+
+Output Specification:
+
+For each test case, print in one line the radix of the other number so that the equation N1 = N2 is true. If the equation is impossible, print "Impossible". If the solution is not unique, output the smallest possible radix.
+
+Sample Input 1:
+6 110 1 10
+Sample Output 1:
+2
+Sample Input 2:
+1 ab 1 2
+Sample Output 2:
+Impossible
+
+--------------------------------------------------------------------------------------------------------------------
+解：没A掉的第一题，通过部分测试点，题意本身不难，进制转换的问题一般都转为十进制再处理。这题的难点在于，要求的进制数没有范围，从2到无穷你每个都要遍历，这样一来一些测试点时间上就会超时，网上有讲说用二分会快点，但是对于常用的从小数开始测试才会更快……
