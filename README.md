@@ -14,3 +14,5 @@ listed in the website, you can complete them all one by one and don't forget to 
 
 Sorry for the little work I have done on this and so happened my faiture. Hope you can treat the practices seriously!
 Wish the content can help you!
+
+tip：Please download package, and use nodepad++(http://notepad-plus-plus.org/download/v6.4.5.html) to open them after decompression.
